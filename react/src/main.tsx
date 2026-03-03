@@ -7,8 +7,6 @@ import "./index.css";
 // 2. Client ID は本来 .env から読み込むのがプロの気合
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
-console.log("Google Client ID:", clientId); // デバッグ用
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     {/* 3. ここで App を包み込む */}

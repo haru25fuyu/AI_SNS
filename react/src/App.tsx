@@ -5,9 +5,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
 
 import AuthPage from "./pages/AuthPage";
-//import ProfileSetupPage from "./pages/ProfileSetupPage";
+import ProfileSetupPage from "./pages/ProfileSetupPage";
+import DashboardPage from "./pages/DashboardPage";
 //import OnboardingPage from "./pages/OnboardingPage";
-//import DashboardPage from "./pages/DashboardPage";
 import TermsPage from "./pages/TermsPage";
 
 export default function App() {
@@ -21,7 +21,8 @@ export default function App() {
           {/* 3. 規約に同意した後に飛んでくる場所 */}
           <Route path="/auth" element={<AuthPage />} />
 
-          <Route path="/setup" element={<TermsPage />} />
+          <Route path="/setup" element={<ProfileSetupPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
 
           {/* 4. どこにも当てはまらない、または最初に来た人を /terms へ誘導 */}
           <Route path="*" element={<Navigate to="/terms" replace />} />
