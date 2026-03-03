@@ -114,9 +114,10 @@ func GoogleAuthHandler(w http.ResponseWriter, r *http.Request) {
 		Name:     "refresh_token",
 		Value:    refreshToken,
 		HttpOnly: true,
-		Secure:   true, // 本番はHTTPS必須
+		Secure:   false, // ローカル開発中(HTTP)は false にする
 		Path:     "/api/auth/refresh",
 		MaxAge:   60 * 60 * 24 * 30,
+		SameSite: http.SameSiteLaxMode, // 明示的にLaxを設定
 	})
 
 	json.NewEncoder(w).Encode(map[string]interface{}{

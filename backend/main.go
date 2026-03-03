@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"nook-backend/internal/auth"
 	"nook-backend/internal/config"
 	"nook-backend/internal/database"
 	"nook-backend/internal/handlers"
@@ -25,12 +26,19 @@ func main() {
 	mux := http.NewServeMux()
 
 	// ルーティングの設定
+	mux.HandleFunc("/api/auth/refresh", handlers.RefreshHandler)
 	mux.HandleFunc("/api/ai/onboarding", handlers.OnboardingHandler)
 	mux.HandleFunc("/api/auth/google", handlers.GoogleAuthHandler)
 
 	// CORSミドルウェアで包む
-	// 下に書いてあった enableCORS と中身は同じなので、パッケージ化したこちらを使います
 	handler := middleware.CORS(mux)
+
+	// アップロードされた画像を提供するための静的ファイルサーバー
+	fileServer := http.FileServer(http.Dir("./uploads"))
+	mux.Handle("/uploads/", http.StripPrefix("/uploads/", fileServer))
+
+	mux.Handle("/api/users/profile", auth.RequireAuth(handlers.UpdateProfileHandler))
+	mux.Handle("/api/users/me", auth.RequireAuth(handlers.GetProfileHandler))
 
 	// サーバー開始のログ（開始「直前」に書くのがコツ！）
 	fmt.Println("nook-backend: サーバーをポート8080で開始します... ")

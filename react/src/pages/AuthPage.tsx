@@ -1,14 +1,14 @@
 // src/pages/AuthPage.tsx
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import axios from "axios";
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const { updateAuth } = useUser(); // Contextの更新関数を取得
+  const { login } = useUser(); // Contextの更新関数を取得
 
-  const handleSuccess = async (response: any) => {
+  const handleSuccess = async (response: CredentialResponse) => {
     // 1. localStorage から誕生日を取得
     const birthDate = localStorage.getItem("kiai_birth_date");
 
@@ -19,23 +19,27 @@ export default function AuthPage() {
     }
 
     // 2. Googleトークンと誕生日をセットで送信
-    const res = await axios.post("http://localhost:8080/api/auth/google", {
-      token: response.credential,
-      birth_date: birthDate // ← ここで合体！
-    });
+    const res = await axios.post(
+      "http://localhost:8080/api/auth/google",
+      {
+        token: response.credential,
+        birth_date: birthDate
+      },
+      {
+        withCredentials: true
+      }
+    );
 
     if (!res || res.status !== 200) {
       alert("ログインサーバーとの接続に失敗しました。");
       return;
     }
 
-    console.log("Google Login Response:", res.data); // デバッグ用
-
     const data = res.data;
 
     // 3. ログイン成功後の処理
     // 前回作った「一度だけデコードしてStoreに入れる」処理をここで実行
-    updateAuth(data.access_token, {
+    login(data.access_token, {
       userId: data.userID,
       isMinor: data.isMinor // バックエンドから返ってくる判定フラグ
     });
