@@ -1,4 +1,4 @@
-// vite.config.ts
+// vite.con;qvt\nhq;vt;x\v;v,F,hhlFT,h\lwvf;f;hnfxh\;\t;qvfhqhxig.ts
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -23,9 +23,7 @@ export default defineConfig(({ mode }) => {
 
       hmr: process.env.DISABLE_HMR !== 'true',
       headers: {
-        // COOP設定はバッチリ入っています！これでポップアップの問題は解決します
-        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-        // ついでにこれも入れておくと、iframe関連のエラーを防げます
+        'Cross-Origin-Opener-Policy': 'unsafe-none',
         'Cross-Origin-Embedder-Policy': 'unsafe-none',
       },
     },

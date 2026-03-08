@@ -1,6 +1,8 @@
 // src/pages/DashboardPage.tsx （または既存のホーム画面ファイル）
 import React from "react";
+
 import UserProfile from "../components/UserProfile";
+import BottomNav from "../components/common/BottomNav";
 
 export default function DashboardPage() {
   return (
@@ -12,6 +14,13 @@ export default function DashboardPage() {
 
       {/* タイムラインなどのメインコンテンツが続く想定 */}
       <main className="text-zinc-400">ここからコンテンツが始まります...</main>
+
+      {/* 切り出したナビゲーション */}
+      <BottomNav
+        activeTab={"timeline"}
+        onTabChange={tab => console.log("タブ変更:", tab)}
+        onPostClick={() => console.log("ボトルを投げるアクション"):j,mm}
+      />
     </div>
   );
 }

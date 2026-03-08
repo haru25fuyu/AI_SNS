@@ -37,15 +37,14 @@ func GoogleAuthHandler(w http.ResponseWriter, r *http.Request) {
 
 	googleID := payload.Subject
 	email := payload.Claims["email"].(string)
-	name := payload.Claims["name"].(string)
 	picture := payload.Claims["picture"].(string)
 
 	db := database.GetDB()
 	user := models.User{
-		ID:          uuid.Nil, // 後でDBから生成されるのでここでは空でOK
-		DisplayName: name,
-		BirthDate:   time.Time{}, // 後でDBから取得するのでここでは空でOK
-		IsSetup:     false,       // 初期値、後でDBから取得するのでここではfalseでOK
+		ID:          uuid.Nil,                          // 後でDBから生成されるのでここでは空でOK
+		DisplayName: "User_" + uuid.New().String()[:4], // 仮の表示名、後でDBから取得するのでここでは適当でOK
+		BirthDate:   time.Time{},                       // 後でDBから取得するのでここでは空でOK
+		IsSetup:     false,                             // 初期値、後でDBから取得するのでここではfalseでOK
 	} // これがないとmodelsパッケージがimportされないので、User構造体を一度参照しておきます
 
 	// 2. データベース操作（トランザクション）
@@ -71,7 +70,7 @@ func GoogleAuthHandler(w http.ResponseWriter, r *http.Request) {
 		// users作成 (UUIDをRETURNINGで受け取る)
 		queryUser := `INSERT INTO users (display_name, avatar_url, birth_date) 
                       VALUES ($1, $2, $3) RETURNING id, is_setup`
-		err = tx.QueryRow(queryUser, name, picture, user.BirthDate).Scan(&user.ID, &user.IsSetup)
+		err = tx.QueryRow(queryUser, user.DisplayName, picture, user.BirthDate).Scan(&user.ID, &user.IsSetup)
 		if err != nil {
 			tx.Rollback()
 			http.Error(w, "ユーザー作成失敗", http.StatusInternalServerError)

@@ -12,8 +12,8 @@ import TermsPage from "./pages/TermsPage";
 
 export default function App() {
   return (
-    <UserProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <UserProvider>
         <Routes>
           {/* 2. 最初に表示されるのはここ！ */}
           <Route path="/terms" element={<TermsPage />} />
@@ -27,7 +27,7 @@ export default function App() {
           {/* 4. どこにも当てはまらない、または最初に来た人を /terms へ誘導 */}
           <Route path="*" element={<Navigate to="/terms" replace />} />
         </Routes>
-      </BrowserRouter>
-    </UserProvider>
+      </UserProvider>
+    </BrowserRouter>
   );
 }
