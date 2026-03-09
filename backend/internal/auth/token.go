@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"nook-backend/internal/config"
+	"nook-backend/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -31,7 +31,7 @@ func GenerateAccessToken(userID uuid.UUID, isMinor bool) (string, error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(config.AppConfig.JWTSecret))
+	return token.SignedString([]byte(config.JWTSecret))
 }
 
 // リフレッシュトークン生成（引数を uuid.UUID に変更）
@@ -41,7 +41,7 @@ func GenerateRefreshToken(userID uuid.UUID) (string, error) {
 		"exp":     time.Now().Add(24 * 30 * time.Hour).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(config.AppConfig.JWTRefreshSecret))
+	return token.SignedString([]byte(config.JWTRefreshSecret))
 }
 
 func IsMinor(birthDate time.Time) bool {
@@ -61,7 +61,7 @@ func ValidateAccessToken(tokenString string) (*AuthInfo, error) {
 
 	// 署名の検証とパース
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.AppConfig.JWTSecret), nil
+		return []byte(config.JWTSecret), nil
 	})
 
 	if err != nil || !token.Valid {

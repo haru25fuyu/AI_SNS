@@ -16,3 +16,5 @@ react/node_modules
 react/dist
 react/build
 react/.cache
+
+backend/firebase-key.json

@@ -42,6 +42,8 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
     ? displayName.trim().charAt(0).toUpperCase()
     : "?";
 
+		console.log("UserAvatar: avatarUrl =", avatarUrl, "=> avatarSrc =", avatarSrc); // デバッグ用ログ
+
   return (
     <div
       className={`${sizeClasses[

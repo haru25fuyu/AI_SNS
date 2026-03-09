@@ -3,7 +3,7 @@ import React, {
   useState,
   useContext,
   ReactNode,
-  useEffect,
+  useEffect
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // useLocationを追加
 import { setAuthData, getAccessTokenFromMemory } from "../api/authStore";
@@ -36,44 +36,29 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // 未ログインでも見れるページのリスト
-  const publicPaths = ["/auth", "/terms", "/privacy"]; 
+  const publicPaths = ["/auth", "/terms", "/privacy"];
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const token = getAccessTokenFromMemory();
-      
-      // 現在のページが公開ページかどうか
+    const initAuth = async () => {
       const isPublicPath = publicPaths.includes(location.pathname);
 
-      if (!token) {
-        setIsLoading(false);
-        // トークンがなくて、かつ公開ページでもない場合のみ飛ばす
-        if (!isPublicPath) {
-          navigate("/auth");
-        }
-        return;
-      }
-
       try {
-        const res = await client.get("/users/me");
+        const res = await client.get("/user/me");
+
         const data = res.data;
+        // Axiosが復活させてくれた最新のトークンをメモリにセットし直す
+        const newToken = getAccessTokenFromMemory();
 
-        setUser((prev) => ({
-          userId: data.id || prev?.userId || "",
-          isMinor: data.is_minor ?? prev?.isMinor ?? false,
+        setUser({
+          userId: data.id,
+          isMinor: data.is_minor,
           displayName: data.display_name,
-          avatarUrl: data.avatar_url,
-        }));
-        
-        setAccessToken(token);
-      } catch (error: any) {
-        console.error("プロフィール情報の取得に失敗しました", error);
-        
-        setUser(null);
-        setAccessToken(null);
-        setAuthData(null, null);
-
-        // 失敗時も、公開ページ以外にいる時だけ飛ばす
+          avatarUrl: data.avatar_url
+        });
+        setAccessToken(newToken);
+      } catch (error) {
+        // ここに来る ＝ Cookieも死んでいて、Axiosも復活させられなかった「本当の未ログイン」
+        console.log("復活失敗、または未ログインです");
         if (!isPublicPath) {
           navigate("/auth");
         }
@@ -82,8 +67,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    fetchProfile();
-  }, [accessToken, location.pathname]);
+    initAuth();
+  }, []);
 
   const login = (token: string, userData: UserState) => {
     setAccessToken(token);
@@ -102,7 +87,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     <UserContext.Provider
       value={{ user, accessToken, login, logout, isLoading }}
     >
-      {children}
+      {isLoading
+        ? <div>認証チェック中...</div> // ここで追い出しを止めている
+        : children}
     </UserContext.Provider>
   );
 };

@@ -9,6 +9,8 @@ import ProfileSetupPage from "./pages/ProfileSetupPage";
 import DashboardPage from "./pages/DashboardPage";
 //import OnboardingPage from "./pages/OnboardingPage";
 import TermsPage from "./pages/TermsPage";
+import ChatRoomPage from "./pages/ChatRoomPage";
+import ChatListPage from "./pages/ChatListPage";
 
 export default function App() {
   return (
@@ -23,6 +25,8 @@ export default function App() {
 
           <Route path="/setup" element={<ProfileSetupPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/chat/:userId" element={<ChatRoomPage />} />
+          <Route path="/chats" element={<ChatListPage />} />
 
           {/* 4. どこにも当てはまらない、または最初に来た人を /terms へ誘導 */}
           <Route path="*" element={<Navigate to="/terms" replace />} />

@@ -25,11 +25,13 @@ services:
       - ./backend:/app
     env_file:
       - ./backend/.env
+
     depends_on:
       db:
         condition: service_healthy
     environment:
       DB_SOURCE: "postgresql://nook_user:fP4!7zzYWfTW@db:5432/nook_db?sslmode=disable"
+      GOOGLE_APPLICATION_CREDENTIALS: "/app/secrets/service-account.json"
       GEMINI_API_KEY: "YOUR_GEMINI_API_KEY"
 
 volumes:

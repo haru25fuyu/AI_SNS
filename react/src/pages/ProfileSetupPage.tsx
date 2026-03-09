@@ -33,7 +33,7 @@ export default function ProfileSetupPage() {
 
 	useEffect(() => {
 		// apiから	ユーザーデータの取得
-		client.get("/users/me").then((res) => {
+		client.get("/user/me").then((res) => {
 
 			setDisplayName(res.data.display_name);
 			setAvatarPreview(res.data.avatar_url);
@@ -58,7 +58,7 @@ export default function ProfileSetupPage() {
       }
 
       // 2. バックエンドへPOST送信 (multipart/form-data)
-      await client.post("/users/profile", formData, {
+      await client.post("/user/profile", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

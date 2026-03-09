@@ -3,8 +3,21 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"nook-backend/services" // プロジェクト名に合わせて調整
+	"nook-backend/services"
+
+	"github.com/gorilla/mux"
 )
+
+type AiHandler struct {
+}
+
+func NewAiHandler() *AiHandler {
+	return &AiHandler{}
+}
+
+func (h *AiHandler) RegisterRoutes(r *mux.Router) {
+	r.HandleFunc("/api/ai/onboarding", h.OnboardingHandler).Methods("POST", "OPTIONS")
+}
 
 type OnboardingRequest struct {
 	History []struct {
@@ -13,7 +26,7 @@ type OnboardingRequest struct {
 	} `json:"history"`
 }
 
-func OnboardingHandler(w http.ResponseWriter, r *http.Request) {
+func (h *AiHandler) OnboardingHandler(w http.ResponseWriter, r *http.Request) {
 	// CORS設定
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")

@@ -1,22 +1,25 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-var db *sql.DB
+type Database struct {
+	DB *sqlx.DB
+}
 
-func InitDB(source string) *sql.DB {
+func InitDB(source string) (*Database, error) {
+	var db *sqlx.DB
 	var err error
 
 	// 最大10回リトライする
 	for i := 0; i < 10; i++ {
-		db, err = sql.Open("postgres", source)
+		db, err = sqlx.Open("postgres", source)
 		if err == nil {
 			err = db.Ping()
 			if err == nil {
@@ -62,9 +65,5 @@ CREATE TABLE IF NOT EXISTS bottles (
 	}
 	fmt.Println("テーブル作成完了！")
 
-	return db
-}
-
-func GetDB() *sql.DB {
-	return db
+	return &Database{DB: db}, nil
 }

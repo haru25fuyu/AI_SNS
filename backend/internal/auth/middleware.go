@@ -14,22 +14,29 @@ func RequireAuth(f func(http.ResponseWriter, *http.Request)) http.Handler {
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenString := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+		authHeader := r.Header.Get("Authorization")
 
-		// 念のため前後の空白や改行を削除（これだけで直るケースもあります）
-		tokenString = strings.TrimSpace(tokenString)
+		// 2. スペース（半角、連続、タブ等）で分割する
+		parts := strings.Fields(authHeader)
 
-		// 鑑定関数をガチャンと呼ぶ
+		// 3. "Bearer <TOKEN>" の2要素になっているかチェック
+		// strings.EqualFold は大文字小文字を無視して比較してくれる
+		if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
+			fmt.Printf("認証エラー詳細: ヘッダー形式が不正です (Header: %s)\n", authHeader)
+			http.Error(w, "認証形式が正しくありません (Bearer <token>)", http.StatusUnauthorized)
+			return
+		}
+
+		tokenString := parts[1] // これで確実にトークンだけ取れる
+
+		// 4. 鑑定関数を呼ぶ
 		authInfo, err := ValidateAccessToken(tokenString)
 		if err != nil {
-			// ▼ ここで実際のエラー内容をバックエンドのコンソールに出力 ▼
 			fmt.Printf("認証エラー詳細: %v\n", err)
-
 			http.Error(w, "認証に失敗しました", http.StatusUnauthorized)
 			return
 		}
 
-		// 次の工程（ハンドラー）に「鑑定済み情報」を渡す
 		ctx := context.WithValue(r.Context(), "auth", authInfo)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

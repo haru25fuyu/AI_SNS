@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"nook-backend/internal/auth"
-	"nook-backend/internal/config"
+	"nook-backend/config"
 	"nook-backend/internal/database"
 	"nook-backend/internal/handlers"
-	"nook-backend/middleware"
+	"nook-backend/services"
 	"os"
 
+	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
@@ -19,32 +19,35 @@ func main() {
 	config.InitConfig()
 
 	//  DB接続（環境変数は Docker Compose から渡される想定）
-	db := database.InitDB(os.Getenv("DB_SOURCE"))
-	defer db.Close()
+	db, err := database.InitDB(os.Getenv("DB_SOURCE"))
+	if err != nil {
+		log.Fatal("DB接続失敗:", err)
+	}
+
+	fsClient := services.InitFirebase()
 
 	// ルーターの作成
-	mux := http.NewServeMux()
+	r := mux.NewRouter()
 
 	// ルーティングの設定
-	mux.HandleFunc("/api/auth/refresh", handlers.RefreshHandler)
-	mux.HandleFunc("/api/ai/onboarding", handlers.OnboardingHandler)
-	mux.HandleFunc("/api/auth/google", handlers.GoogleAuthHandler)
+	handlers.NewAuthHandler(db).RegisterRoutes(r)
+	handlers.NewAiHandler().RegisterRoutes(r)
 
 	// CORSミドルウェアで包む
-	handler := middleware.CORS(mux)
+	//handler := middleware.CORS(r)
 
 	// アップロードされた画像を提供するための静的ファイルサーバー
 	fileServer := http.FileServer(http.Dir("./uploads"))
-	mux.Handle("/uploads/", http.StripPrefix("/uploads/", fileServer))
+	r.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", fileServer))
 
-	mux.Handle("/api/users/profile", auth.RequireAuth(handlers.UpdateProfileHandler))
-	mux.Handle("/api/users/me", auth.RequireAuth(handlers.GetProfileHandler))
+	handlers.NewUserHandler(db, fsClient).RegisterRoutes(r)
+	handlers.NewChatHandler(db, fsClient).RegisterRoutes(r)
 
 	// サーバー開始のログ（開始「直前」に書くのがコツ！）
 	fmt.Println("nook-backend: サーバーをポート8080で開始します... ")
 
 	// サーバー起動（ここでプログラムは「待機状態」に入ります）
-	if err := http.ListenAndServe(":8080", handler); err != nil {
+	if err := http.ListenAndServe(":8080", r); err != nil {
 		log.Fatal("サーバー起動失敗:", err)
 	}
 }

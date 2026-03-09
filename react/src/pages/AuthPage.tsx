@@ -10,7 +10,7 @@ export default function AuthPage() {
 
   const handleSuccess = async (response: CredentialResponse) => {
     // 1. localStorage から誕生日を取得
-    const birthDate = localStorage.getItem("kiai_birth_date");
+    const birthDate = localStorage.getItem("birth_date");
 
     if (!birthDate) {
       alert("誕生日が設定されていません。憲章ページからやり直してください。");

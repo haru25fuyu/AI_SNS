@@ -19,10 +19,6 @@ export interface CustomJwtPayload extends JwtPayload {
 // 通信を送る直前の「割り込み処理」
 client.interceptors.request.use((config) => {
   const token = getAccessTokenFromMemory();
-  console.log(
-    'Axiosリクエストインターセプター: 現在のアクセストークンは',
-    token,
-  ); // デバッグ用ログ
   if (token) {
     // プロパティへの直接代入ではなく .set() を使用する
     config.headers.set('Authorization', `Bearer ${token}`);

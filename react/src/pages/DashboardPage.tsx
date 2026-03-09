@@ -13,13 +13,15 @@ export default function DashboardPage() {
       </header>
 
       {/* タイムラインなどのメインコンテンツが続く想定 */}
-      <main className="text-zinc-400">ここからコンテンツが始まります...</main>
+      <main className="text-zinc-400">
+        
+      </main>
 
       {/* 切り出したナビゲーション */}
       <BottomNav
         activeTab={"timeline"}
         onTabChange={tab => console.log("タブ変更:", tab)}
-        onPostClick={() => console.log("ボトルを投げるアクション"):j,mm}
+        onPostClick={() => console.log("ボトルを投げるアクション")}
       />
     </div>
   );
