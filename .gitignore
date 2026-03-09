@@ -17,4 +17,4 @@ react/dist
 react/build
 react/.cache
 
-backend/firebase-key.json
+backend/config/firebase-key.json
