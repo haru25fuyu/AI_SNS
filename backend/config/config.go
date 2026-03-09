@@ -16,7 +16,7 @@ func InitConfig() {
 	JWTSecret = getEnv("JWT_SECRET", "") // デフォルトは空文字（必須なので後でチェック）
 	JWTRefreshSecret = getEnv("JWT_REFRESH_SECRET", "")
 	GoogleClientID = getEnv("GOOGLE_CLIENT_ID", "")
-	FirestoreProjectID = getEnv("FIREBASE_PROJECT_ID","nook-ai-sns-67af4");
+	FirestoreProjectID = getEnv("FIREBASE_PROJECT_ID","");
 
 	// 必須チェック（鍵がないと動かないので）
 	if JWTSecret == "" || JWTRefreshSecret == "" || GoogleClientID == "" || FirestoreProjectID == "" {
